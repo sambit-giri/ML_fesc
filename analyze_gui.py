@@ -1,7 +1,7 @@
 import numpy as np
 from glob import glob
 from Tkinter import *
-from find_candidate import show_hist_z_range
+from find_candidate import show_hist_z_range, show_scatter_z
 import matplotlib.pyplot as plt
 
 master = Tk()
@@ -34,11 +34,18 @@ def display_hist():
 	camera = np.array([cam_a.get(),cam_i.get()])
 	zl, zh = float(e1.get()), float(e2.get())
 	stel   = float(e3.get())
-	#print lens_var, mags_var
-	#print camera
-	#print zl, zh
 	plt.clf()
 	show_hist_z_range(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, bins=10, stel=stel)
+	plt.show()
+
+def display_scat():
+	lens_var, mags_var = get_inputs()
+	camera = np.array([cam_a.get(),cam_i.get()])
+	zl, zh = float(e1.get()), float(e2.get())
+	stel   = float(e3.get())
+	f_name = e4.get()
+	plt.clf()
+	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name)
 	plt.show()
 
 def clear_figure():
@@ -122,7 +129,13 @@ e3 = Entry(master)
 e3.grid(row=11, column=1)
 e3.insert(END, '0.2')
 
-Button(master, text='Histogram', command=display_hist).grid(row=12, column=0, sticky=W, pady=4)
-Button(master, text='Clear', command=clear_figure).grid(row=12, column=1, sticky=W, pady=4)
-Button(master, text='Quit', command=master.quit).grid(row=12, column=2, sticky=W, pady=4)
+Label(master, text="Filter name:").grid(row=12, column=0, sticky=W)
+e4 = Entry(master)
+e4.grid(row=12, column=1)
+e4.insert(END, 'f105w')
+
+Button(master, text='Histogram', command=display_hist).grid(row=13, column=0, sticky=W, pady=4)
+Button(master, text='Scatter', command=display_scat).grid(row=13, column=1, sticky=W, pady=4)
+Button(master, text='Clear', command=clear_figure).grid(row=13, column=2, sticky=W, pady=4)
+Button(master, text='Quit', command=master.quit).grid(row=13, column=3, sticky=W, pady=4)
 mainloop()
