@@ -95,7 +95,11 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
 			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=1000, stel=0.2, z_pos=z_pos, f_pos=f_pos)
-			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=lens_names[l]+'('+str(xx.shape[0])+')', fmt='o')
+			num0 = xx.shape[0]; num=num0
+			if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
+			if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
+			if xlim_l and xlim_r: num = num1+num2-num0
+			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=lens_names[l]+'('+str(num)+')', fmt='o')
 			#to = xx.size
 	if mm.size:
 		for m in mm:
@@ -111,7 +115,11 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
 			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=1000, stel=0.2, z_pos=z_pos, f_pos=f_pos)
-			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=mags_names[m]+'('+str(xx.shape[0])+')', fmt='o')
+			num0 = xx.shape[0]; num=num0
+			if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
+			if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
+			if xlim_l and xlim_r: num = num1+num2-num0
+			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=mags_names[m]+'('+str(num)+')', fmt='o')
 			#to = xx.size
 	plt.xlim(xlim_l,xlim_r)
 	#plt.ylim(bottom=zl-1)
