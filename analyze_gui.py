@@ -56,7 +56,7 @@ def clear_figure():
 	plt.clf()
 	plt.show()
 
-Label(master, text="X-ray Selected Clusters:").grid(row=0, sticky=W)
+Label(master, text="X-ray Selected Clusters:", fg="green").grid(row=0, sticky=W)
 
 var00 = IntVar()
 Checkbutton(master, text=lens_names[0], variable=var00).grid(row=1, column=0,sticky=W)
@@ -99,7 +99,7 @@ Checkbutton(master, text=lens_names[18], variable=var18).grid(row=4, column=3,st
 var19 = IntVar()
 Checkbutton(master, text=lens_names[19], variable=var19).grid(row=4, column=4,sticky=W)
 
-Label(master, text="High Magnification Clusters:").grid(row=5, sticky=W)
+Label(master, text="High Magnification Clusters:", fg="green").grid(row=5, sticky=W)
 var20 = IntVar()
 Checkbutton(master, text=mags_names[0], variable=var20).grid(row=6, column=0,sticky=W)
 var21 = IntVar()
@@ -111,13 +111,13 @@ Checkbutton(master, text=mags_names[3], variable=var23).grid(row=6, column=3,sti
 var24 = IntVar()
 Checkbutton(master, text=mags_names[4], variable=var24).grid(row=6, column=4,sticky=W)
 
-Label(master, text="Camera:").grid(row=7, sticky=W)
+Label(master, text="Camera:", fg="blue").grid(row=7, sticky=W)
 cam_a = IntVar(value=1)
 Checkbutton(master, text='ACS+IR', variable=cam_a).grid(row=8, column=0,sticky=W)
 cam_i = IntVar(value=1)
 Checkbutton(master, text='IR', variable=cam_i).grid(row=8, column=1,sticky=W)
 
-Label(master, text="Redshift range:").grid(row=10, sticky=W)
+Label(master, text="Redshift range:", fg="red").grid(row=10, sticky=W)
 
 Label(master, text="lower z").grid(row=11, column=0)
 Label(master, text="upper z").grid(row=11, column=2)
@@ -128,12 +128,12 @@ e2.grid(row=11, column=3)
 e1.insert(END, '6')
 e2.insert(END, '1000')
 
-Label(master, text="Stel threshold:").grid(row=9, column=0, sticky=W)
+Label(master, text="Stel threshold:", fg="red").grid(row=9, column=0, sticky=W)
 e3 = Entry(master)
 e3.grid(row=9, column=1)
 e3.insert(END, '0.2')
 
-Label(master, text="Filter name:").grid(row=12, column=0, sticky=W)
+Label(master, text="Filter name:", fg="red").grid(row=12, column=0, sticky=W)
 e4 = Entry(master)
 e4.grid(row=12, column=1)
 e4.insert(END, 'f105w')
