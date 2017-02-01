@@ -1,7 +1,7 @@
 import numpy as np
 from glob import glob
 from Tkinter import *
-from find_candidate import show_hist_z_range, show_scatter_z
+from find_candidate import show_hist_z_range, show_scatter_z, show_object_details
 import matplotlib.pyplot as plt
 
 master = Tk()
@@ -51,6 +51,23 @@ def display_scat():
 	plt.clf()
 	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r)
 	plt.show()
+
+def display_details():
+	lens_var, mags_var = get_inputs()
+	camera = np.array([cam_a.get(),cam_i.get()])
+	zl, zh = float(e1.get()), float(e2.get())
+	stel   = float(e3.get())
+	f_name = e4.get()
+	if e5.get() == '': xlim_l = None 
+	else: xlim_l = float(e5.get())
+	if e6.get() == '': xlim_r = None
+	else: xlim_r = float(e6.get())
+	data = show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r)
+	#tkMessageBox.showinfo("Say Hello", "Hello World")
+	#for i in xrange(data.shape[0]):
+	#	print data[i,:]
+	#print 'ID\tRA\tDec\tx\ty'
+	#print data
 
 def clear_figure():
 	plt.clf()
@@ -147,6 +164,7 @@ e6.grid(row=13, column=2)
 
 Button(master, text='Histogram', command=display_hist).grid(row=14, column=0, sticky=W, pady=4)
 Button(master, text='Scatter', command=display_scat).grid(row=14, column=1, sticky=W, pady=4)
-Button(master, text='Clear', command=clear_figure).grid(row=14, column=2, sticky=W, pady=4)
-Button(master, text='Quit', command=master.quit).grid(row=14, column=3, sticky=W, pady=4)
+Button(master, text='Get details', command=display_details).grid(row=14, column=2, sticky=W, pady=4)
+Button(master, text='Clear', command=clear_figure).grid(row=14, column=3, sticky=W, pady=4)
+Button(master, text='Quit', command=master.quit).grid(row=14, column=4, sticky=W, pady=4)
 mainloop()
