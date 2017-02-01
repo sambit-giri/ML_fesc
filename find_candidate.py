@@ -114,6 +114,7 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=mags_names[m]+'('+str(xx.shape[0])+')', fmt='o')
 			#to = xx.size
 	plt.xlim(xlim_l,xlim_r)
+	#plt.ylim(bottom=zl-1)
 	plt.xlabel('m')
 	plt.ylabel('z')
 	plt.legend(loc=0)
