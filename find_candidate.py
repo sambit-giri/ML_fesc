@@ -2,15 +2,6 @@ import numpy as np
 from glob import glob
 import matplotlib.pyplot as plt
 
-#data_dir = '/disk/dawn-1/sgiri/ML_project/ML_fesc/CLASH_data'
-#lens_fol = glob(data_dir+'/ABELL*')+glob(data_dir+'/MACS*')+glob(data_dir+'/RXJ*')+glob(data_dir+'/MS*')+glob(data_dir+'/CL*')
-#mags_fol = glob(data_dir+'/high_magnification/*')
-
-#lens_names = [s.split('/')[-1] for s in lens_fol]
-#mags_names = [s.split('/')[-1] for s in mags_fol]
-
-#lens_var = []
-#mags_var = []
 
 def histogram_z_range(data_all, zl, zh=1000, bins=10, stel=0.2, z_pos=115):
 	data_all = data_all[data_all[:,7]<stel]
@@ -29,6 +20,7 @@ def show_hist_z_range(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=100
 	to = 0
 	if ll.size:
 		for l in ll:
+			l = l[0]
 			filea = glob(lens_fol[l]+'/*_acs*')
 			filei = glob(lens_fol[l]+'/*_ir*')
 			z_pos = get_var_pos(filea[0], 'zb')
@@ -43,6 +35,7 @@ def show_hist_z_range(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=100
 			to = to + np.sum(yy)
 	if mm.size:
 		for m in mm:
+			m = m[0]
 			filea = glob(mags_fol[m]+'/*_acs*')
 			filei = glob(mags_fol[m]+'/*_ir*')
 			z_pos = get_var_pos(filea[0], 'zb')
@@ -55,6 +48,8 @@ def show_hist_z_range(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=100
 			xx,yy = histogram_z_range(data, zl, zh=zh, bins=bins, stel=stel, z_pos=z_pos)
 			plt.step(xx,yy, label=mags_names[m])
 			to = to + np.sum(yy)
+	plt.ylabel('n(z)')
+	plt.xlabel('z')
 	plt.legend(loc=0)
 	return to
 
@@ -79,7 +74,7 @@ def get_scatter_z(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97):
 	#plt.errorbar(x, y, xerr=xerr, fmt='o')
 	return data_f, data_z, data_f_er, data_z_lo, data_z_hi
 
-def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w'):
+def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None):
 	assert camera[0] or camera[1] == 1
 	lens_names = [s.split('/')[-1] for s in lens_fol]
 	mags_names = [s.split('/')[-1] for s in mags_fol]
@@ -88,6 +83,7 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 	to = 0
 	if ll.size:
 		for l in ll:
+			l = l[0]
 			filea = glob(lens_fol[l]+'/*_acs*')
 			filei = glob(lens_fol[l]+'/*_ir*')
 			z_pos = get_var_pos(filea[0], 'zb')
@@ -99,10 +95,11 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
 			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=1000, stel=0.2, z_pos=z_pos, f_pos=f_pos)
-			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=lens_names[l]+':'+str(xx.shape[0]), fmt='o')
+			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=lens_names[l]+'('+str(xx.shape[0])+')', fmt='o')
 			#to = xx.size
 	if mm.size:
 		for m in mm:
+			m = m[0]
 			filea = glob(mags_fol[m]+'/*_acs*')
 			filei = glob(mags_fol[m]+'/*_ir*')
 			z_pos = get_var_pos(filea[0], 'zb')
@@ -114,8 +111,11 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
 			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=1000, stel=0.2, z_pos=z_pos, f_pos=f_pos)
-			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=lens_names[l]+':'+str(xx.shape[0]), fmt='o')
+			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=mags_names[m]+'('+str(xx.shape[0])+')', fmt='o')
 			#to = xx.size
+	plt.xlim(xlim_l,xlim_r)
+	plt.xlabel('m')
+	plt.ylabel('z')
 	plt.legend(loc=0)
 	return to
 

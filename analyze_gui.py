@@ -44,8 +44,12 @@ def display_scat():
 	zl, zh = float(e1.get()), float(e2.get())
 	stel   = float(e3.get())
 	f_name = e4.get()
+	if e5.get() == '': xlim_l = None 
+	else: xlim_l = float(e5.get())
+	if e6.get() == '': xlim_r = None
+	else: xlim_r = float(e6.get())
 	plt.clf()
-	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name)
+	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r)
 	plt.show()
 
 def clear_figure():
@@ -113,20 +117,20 @@ Checkbutton(master, text='ACS+IR', variable=cam_a).grid(row=8, column=0,sticky=W
 cam_i = IntVar(value=1)
 Checkbutton(master, text='IR', variable=cam_i).grid(row=8, column=1,sticky=W)
 
-Label(master, text="Redshift range:").grid(row=9, sticky=W)
+Label(master, text="Redshift range:").grid(row=10, sticky=W)
 
-Label(master, text="lower z").grid(row=10, column=0)
-Label(master, text="upper z").grid(row=10, column=2)
+Label(master, text="lower z").grid(row=11, column=0)
+Label(master, text="upper z").grid(row=11, column=2)
 e1 = Entry(master)
 e2 = Entry(master)
-e1.grid(row=10, column=1)
-e2.grid(row=10, column=3)
+e1.grid(row=11, column=1)
+e2.grid(row=11, column=3)
 e1.insert(END, '6')
 e2.insert(END, '1000')
 
-Label(master, text="Stel threshold:").grid(row=11, column=0, sticky=W)
+Label(master, text="Stel threshold:").grid(row=9, column=0, sticky=W)
 e3 = Entry(master)
-e3.grid(row=11, column=1)
+e3.grid(row=9, column=1)
 e3.insert(END, '0.2')
 
 Label(master, text="Filter name:").grid(row=12, column=0, sticky=W)
@@ -134,8 +138,15 @@ e4 = Entry(master)
 e4.grid(row=12, column=1)
 e4.insert(END, 'f105w')
 
-Button(master, text='Histogram', command=display_hist).grid(row=13, column=0, sticky=W, pady=4)
-Button(master, text='Scatter', command=display_scat).grid(row=13, column=1, sticky=W, pady=4)
-Button(master, text='Clear', command=clear_figure).grid(row=13, column=2, sticky=W, pady=4)
-Button(master, text='Quit', command=master.quit).grid(row=13, column=3, sticky=W, pady=4)
+Label(master, text="Magnitude range:").grid(row=13, column=0)
+e5 = Entry(master)
+e5.grid(row=13, column=1)
+e6 = Entry(master)
+e6.grid(row=13, column=2)
+
+
+Button(master, text='Histogram', command=display_hist).grid(row=14, column=0, sticky=W, pady=4)
+Button(master, text='Scatter', command=display_scat).grid(row=14, column=1, sticky=W, pady=4)
+Button(master, text='Clear', command=clear_figure).grid(row=14, column=2, sticky=W, pady=4)
+Button(master, text='Quit', command=master.quit).grid(row=14, column=3, sticky=W, pady=4)
 mainloop()
