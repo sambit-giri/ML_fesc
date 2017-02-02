@@ -141,7 +141,7 @@ def get_object_details(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, xli
 		data_all = data_all[data_all[:,z_pos]>=zl]
 	if xlim_r: data_all = data_all[data_all[:,f_pos]<=xlim_r]
 	if xlim_l: data_all = data_all[data_all[:,f_pos]>=xlim_l]
-	return data_all[:,:5]
+	return np.hstack((data_all[:,:5],np.expand_dims(data_all[:,z_pos],axis=1)))
 	
 
 def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None, with_err=None):
@@ -166,7 +166,7 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			else: data = data_a*camera[0]+data_i*camera[1]
 			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print lens_names[l]
-			print 'ID\tRA\tDec\tx\ty'
+			print 'ID\tRA\tDec\tx\ty\tzb'
 			print data
 	if mm.size:
 		for m in mm:
@@ -183,7 +183,7 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			else: data = data_a*camera[0]+data_i*camera[1]
 			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print mags_names[m]
-			print 'ID\tRA\tDec\tx\ty'
+			print 'ID\tRA\tDec\tx\ty\tzb'
 			print data
 	return 0
 
