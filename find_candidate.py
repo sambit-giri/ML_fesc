@@ -167,7 +167,8 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print lens_names[l]
 			print 'ID\tRA\tDec\tx\ty\tzb'
-			print data
+			if data.size: 
+				for i in xrange(data.shape[0]): print data[i,:]
 	if mm.size:
 		for m in mm:
 			m = m[0]
@@ -184,6 +185,7 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print mags_names[m]
 			print 'ID\tRA\tDec\tx\ty\tzb'
-			print data
+			if data.size: 
+				for i in xrange(data.shape[0]): print data[i,:]
 	return 0
 
