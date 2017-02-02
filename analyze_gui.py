@@ -48,8 +48,9 @@ def display_scat():
 	else: xlim_l = float(e5.get())
 	if e6.get() == '': xlim_r = None
 	else: xlim_r = float(e6.get())
+	with_err = werr.get()
 	plt.clf()
-	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r)
+	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 	plt.show()
 
 def display_details():
@@ -62,12 +63,8 @@ def display_details():
 	else: xlim_l = float(e5.get())
 	if e6.get() == '': xlim_r = None
 	else: xlim_r = float(e6.get())
-	data = show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r)
-	#tkMessageBox.showinfo("Say Hello", "Hello World")
-	#for i in xrange(data.shape[0]):
-	#	print data[i,:]
-	#print 'ID\tRA\tDec\tx\ty'
-	#print data
+	with_err = werr.get()
+	data = show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 
 def clear_figure():
 	plt.clf()
@@ -144,6 +141,8 @@ e1.grid(row=11, column=1)
 e2.grid(row=11, column=3)
 e1.insert(END, '6')
 e2.insert(END, '1000')
+werr = IntVar()
+Checkbutton(master, text='with errorbar', variable=werr).grid(row=11, column=4,sticky=W)
 
 Label(master, text="Stel threshold:", fg="red").grid(row=9, column=0, sticky=W)
 e3 = Entry(master)
