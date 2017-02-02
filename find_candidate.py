@@ -62,19 +62,22 @@ def get_var_pos(filename, name):
 	var_pos = int(lin[lin.index(name)-1])
 	return var_pos-1
 
-def get_scatter_z(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97):
+def get_scatter_z(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, with_err=None):
 	data_all = data_all[data_all[:,7]<stel]
-	data_all = data_all[data_all[:,z_pos]<=zh]
-	data_all = data_all[data_all[:,z_pos]>=zl]
+	if with_err:
+		data_all = data_all[data_all[:,z_pos+2]<=zh]
+		data_all = data_all[data_all[:,z_pos+1]>=zl]
+	else:
+		data_all = data_all[data_all[:,z_pos]<=zh]
+		data_all = data_all[data_all[:,z_pos]>=zl]
 	data_z = data_all[:,z_pos]
 	data_f = data_all[:,f_pos]
 	data_f_er = data_all[:,f_pos+1]
 	data_z_lo = data_z-data_all[:,z_pos+1]
 	data_z_hi = data_all[:,z_pos+2]-data_z
-	#plt.errorbar(x, y, xerr=xerr, fmt='o')
 	return data_f, data_z, data_f_er, data_z_lo, data_z_hi
 
-def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None):
+def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None, with_err=None):
 	assert camera[0] or camera[1] == 1
 	lens_names = [s.split('/')[-1] for s in lens_fol]
 	mags_names = [s.split('/')[-1] for s in mags_fol]
@@ -94,7 +97,7 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 			if camera[0] and camera[1]:
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
-			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos)
+			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, with_err=with_err)
 			num0 = xx.shape[0]; num=num0
 			if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
 			if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
@@ -114,7 +117,7 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 			if camera[0] and camera[1]:
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
-			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos)
+			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, with_err=with_err)
 			num0 = xx.shape[0]; num=num0
 			if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
 			if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
@@ -128,16 +131,20 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 	plt.legend(loc=0)
 	return to
 
-def get_object_details(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, xlim_l=None, xlim_r=None):
+def get_object_details(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, xlim_l=None, xlim_r=None, with_err=None):
 	data_all = data_all[data_all[:,7]<stel]
-	data_all = data_all[data_all[:,z_pos]<=zh]
-	data_all = data_all[data_all[:,z_pos]>=zl]
+	if with_err:
+		data_all = data_all[data_all[:,z_pos+2]<=zh]
+		data_all = data_all[data_all[:,z_pos+1]>=zl]
+	else:
+		data_all = data_all[data_all[:,z_pos]<=zh]
+		data_all = data_all[data_all[:,z_pos]>=zl]
 	if xlim_r: data_all = data_all[data_all[:,f_pos]<=xlim_r]
 	if xlim_l: data_all = data_all[data_all[:,f_pos]>=xlim_l]
 	return data_all[:,:5]
 	
 
-def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None):
+def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None, with_err=None):
 	assert camera[0] or camera[1] == 1
 	lens_names = [s.split('/')[-1] for s in lens_fol]
 	mags_names = [s.split('/')[-1] for s in mags_fol]
@@ -157,7 +164,7 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			if camera[0] and camera[1]:
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
-			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r)
+			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print lens_names[l]
 			print 'ID\tRA\tDec\tx\ty'
 			print data
@@ -174,7 +181,7 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			if camera[0] and camera[1]:
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
-			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r)
+			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print mags_names[m]
 			print 'ID\tRA\tDec\tx\ty'
 			print data
