@@ -70,6 +70,10 @@ def clear_figure():
 	plt.clf()
 	plt.show()
 
+def write_to_file():
+	filename = e7.get()
+	print 'output/'+filename
+
 Label(master, text="X-ray Selected Clusters:", fg="green").grid(row=0, sticky=W)
 
 var00 = IntVar()
@@ -160,10 +164,18 @@ e5.grid(row=13, column=1)
 e6 = Entry(master)
 e6.grid(row=13, column=2)
 
+Label(master, text="Enter filename:").grid(row=15, column=0)
+e7 = Entry(master)
+e7.grid(row=15, column=1)
+e7.insert(END, 'test')
+
+file_app = IntVar(value=1)
+Checkbutton(master, text='Append data', variable=file_app).grid(row=15, column=2,sticky=W)
 
 Button(master, text='Histogram', command=display_hist).grid(row=14, column=0, sticky=W, pady=4)
 Button(master, text='Scatter', command=display_scat).grid(row=14, column=1, sticky=W, pady=4)
 Button(master, text='Get details', command=display_details).grid(row=14, column=2, sticky=W, pady=4)
 Button(master, text='Clear', command=clear_figure).grid(row=14, column=3, sticky=W, pady=4)
 Button(master, text='Quit', command=master.quit).grid(row=14, column=4, sticky=W, pady=4)
+Button(master, text='Write to File', command=write_to_file).grid(row=15, column=3, sticky=W, pady=4)
 mainloop()

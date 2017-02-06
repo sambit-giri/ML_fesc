@@ -1,7 +1,7 @@
 import numpy as np
 from glob import glob
 from Tkinter import *
-from find_candidate import show_hist_z_range, show_scatter_z, show_object_details
+from find_candidate import *
 import matplotlib.pyplot as plt
 
 master = Tk()
@@ -16,67 +16,30 @@ mags_names = [s.split('/')[-1] for s in mags_fol]
 input_lens = np.zeros(20)
 input_mags = np.zeros(5)
 
-def var_states():
-   print("X-ray clusters: %d,\nHigh magnification clusters: %d" % (var1.get()+var2.get(), var3.get()+var4.get()))
 
-def print_inputs():
-	lens_var, mags_var = get_inputs()
-	print e1.get(), e2.get()
-	print type(e1.get()), type(e2.get())
-
-def get_inputs():
-	lens_var = [var00.get(),var01.get(),var02.get(),var03.get(),var04.get(),var05.get(),var06.get(),var07.get(),var08.get(),var09.get(),var10.get(),var11.get(),var12.get(),var13.get(),var14.get(),var15.get(),var16.get(),var17.get(),var18.get(),var19.get()]
-	mags_var = [var20.get(),var21.get(),var22.get(),var23.get(),var24.get()]
-	return np.array(lens_var), np.array(mags_var)
-
-def display_hist():
-	lens_var, mags_var = get_inputs()
-	camera = np.array([cam_a.get(),cam_i.get()])
-	zl, zh = float(e1.get()), float(e2.get())
-	stel   = float(e3.get())
-	plt.clf()
-	show_hist_z_range(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, bins=10, stel=stel)
-	plt.show()
-
-def display_scat():
-	lens_var, mags_var = get_inputs()
-	camera = np.array([cam_a.get(),cam_i.get()])
-	zl, zh = float(e1.get()), float(e2.get())
-	stel   = float(e3.get())
-	f_name = e4.get()
-	if e5.get() == '': xlim_l = None 
-	else: xlim_l = float(e5.get())
-	if e6.get() == '': xlim_r = None
-	else: xlim_r = float(e6.get())
-	with_err = werr.get()
-	plt.clf()
-	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
-	plt.show()
-
-def display_details():
-	lens_var, mags_var = get_inputs()
-	camera = np.array([cam_a.get(),cam_i.get()])
-	zl, zh = float(e1.get()), float(e2.get())
-	stel   = float(e3.get())
-	f_name = e4.get()
-	if e5.get() == '': xlim_l = None 
-	else: xlim_l = float(e5.get())
-	if e6.get() == '': xlim_r = None
-	else: xlim_r = float(e6.get())
-	with_err = werr.get()
-	data = show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
-
-def clear_figure():
-	plt.clf()
-	plt.show()
+def search_obj():
+	lens = e1.get()
+	obj_id = float(e2.get())
+	if lens == 'all': folders = lens_fol+mags_fol
+	else:
+		if lens.upper() in lens_names: folders = [lens_fol[lens_names.index(lens.upper())]]
+		elif lens.upper() in mags_names: folders = [mags_fol[mags_names.index(lens.upper())]]
+	#print folders
+	for i in xrange(len(folders)):
+		row = show_object_details_ID(folders[i], obj_id)
+		if row.size:
+			print folders[i].split('/')[-1]
+			print row
 
 Label(master, text="Using Object ID:").grid(row=0, column=0, sticky=W)
 Label(master, text="Lens Cluster:", fg="green").grid(row=1, column=0)
 e1 = Entry(master)
 e1.grid(row=1, column=1)
+e1.insert(END, 'all')
 Label(master, text="Object ID:", fg="green").grid(row=1, column=2)
 e2 = Entry(master)
 e2.grid(row=1, column=3)
+Button(master, text='Search', command=search_obj).grid(row=1, column=4, sticky=W, pady=4)
 
 """
 Label(master, text="X-ray Selected Clusters:", fg="green").grid(row=0, sticky=W)

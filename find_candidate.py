@@ -142,7 +142,17 @@ def get_object_details(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, xli
 	if xlim_r: data_all = data_all[data_all[:,f_pos]<=xlim_r]
 	if xlim_l: data_all = data_all[data_all[:,f_pos]>=xlim_l]
 	return np.hstack((data_all[:,:5],np.expand_dims(data_all[:,z_pos],axis=1)))
-	
+
+def show_object_details_ID(folder, obj_id):
+	filea = glob(folder+'/*_acs*')
+	filei = glob(folder+'/*_ir*')
+	data_a   = np.loadtxt(filea[0])
+	data_i   = np.loadtxt(filei[0])
+	data_all = np.vstack((data_a,data_i))
+	loc = np.squeeze(np.argwhere(obj_id==data_all[:,0]))
+	if loc.shape == (): data = np.expand_dims(data_all[loc,:],axis=0)
+	else: data = np.array([data_all[l,:] for l in loc])
+	return data
 
 def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None, with_err=None):
 	assert camera[0] or camera[1] == 1
