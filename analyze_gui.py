@@ -29,16 +29,16 @@ def get_inputs():
 	mags_var = [var20.get(),var21.get(),var22.get(),var23.get(),var24.get()]
 	return np.array(lens_var), np.array(mags_var)
 
-def display_hist():
+def display_hist(save=None):
 	lens_var, mags_var = get_inputs()
 	camera = np.array([cam_a.get(),cam_i.get()])
 	zl, zh = float(e1.get()), float(e2.get())
 	stel   = float(e3.get())
 	plt.clf()
 	show_hist_z_range(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, bins=10, stel=stel)
-	plt.show()
+	if not save: plt.show()
 
-def display_scat():
+def display_scat(save=None):
 	lens_var, mags_var = get_inputs()
 	camera = np.array([cam_a.get(),cam_i.get()])
 	zl, zh = float(e1.get()), float(e2.get())
@@ -51,7 +51,7 @@ def display_scat():
 	with_err = werr.get()
 	plt.clf()
 	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
-	plt.show()
+	if not save: plt.show()
 
 def display_details():
 	lens_var, mags_var = get_inputs()
@@ -65,6 +65,7 @@ def display_details():
 	else: xlim_r = float(e6.get())
 	with_err = werr.get()
 	data = show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
+	return data
 
 def clear_figure():
 	plt.clf()
@@ -72,7 +73,35 @@ def clear_figure():
 
 def write_to_file():
 	filename = e7.get()
-	print 'output/'+filename
+	data = display_details()
+	fname = 'output/'+filename+'_info.txt'
+	print "Data saved as", fname
+	ff = open(fname, 'w')
+	header = 'ID\tRA\tDec\tx\ty\tzb\tzbmin\tzbmax\n'
+	for i in xrange(len(data)):
+		if i%2==0:
+			ff.writelines(data[i]+'\n')
+		else:
+			ff.writelines(header)
+			dat = [str(d) for d in data[i]]	
+			for da in dat:
+				ff.writelines(da)
+				ff.writelines('\n')
+	ff.close()
+
+def save_scatter():
+	filename = e7.get()
+	fname = 'output/'+filename+'_scatter.png'
+	display_scat(save=True)
+	print "The figure is saved as", fname
+	plt.savefig(fname)
+
+def save_histogram():
+	filename = e7.get()
+	fname = 'output/'+filename+'_histogram.png'
+	display_hist(save=True)
+	print "The figure is saved as", fname
+	plt.savefig(fname)
 
 Label(master, text="X-ray Selected Clusters:", fg="green").grid(row=0, sticky=W)
 
@@ -144,7 +173,7 @@ e2 = Entry(master)
 e1.grid(row=11, column=1)
 e2.grid(row=11, column=3)
 e1.insert(END, '6')
-e2.insert(END, '1000')
+e2.insert(END, '100')
 werr = IntVar()
 Checkbutton(master, text='with errorbar', variable=werr).grid(row=11, column=4,sticky=W)
 
@@ -169,13 +198,15 @@ e7 = Entry(master)
 e7.grid(row=15, column=1)
 e7.insert(END, 'test')
 
-file_app = IntVar(value=1)
-Checkbutton(master, text='Append data', variable=file_app).grid(row=15, column=2,sticky=W)
+#file_app = IntVar(value=1)
+#Checkbutton(master, text='Append data', variable=file_app).grid(row=15, column=2,sticky=W)
 
-Button(master, text='Histogram', command=display_hist).grid(row=14, column=0, sticky=W, pady=4)
-Button(master, text='Scatter', command=display_scat).grid(row=14, column=1, sticky=W, pady=4)
-Button(master, text='Get details', command=display_details).grid(row=14, column=2, sticky=W, pady=4)
-Button(master, text='Clear', command=clear_figure).grid(row=14, column=3, sticky=W, pady=4)
-Button(master, text='Quit', command=master.quit).grid(row=14, column=4, sticky=W, pady=4)
-Button(master, text='Write to File', command=write_to_file).grid(row=15, column=3, sticky=W, pady=4)
+Button(master, text='Histogram', command=display_hist).grid(row=14, column=0, pady=4)
+Button(master, text='Scatter', command=display_scat).grid(row=14, column=1, pady=4)
+Button(master, text='Get details', command=display_details).grid(row=14, column=2, pady=4)
+Button(master, text='Clear', command=clear_figure).grid(row=14, column=3, pady=4)
+Button(master, text='Quit', command=master.quit).grid(row=14, column=4, pady=4)
+Button(master, text='Write to File', command=write_to_file).grid(row=15, column=2, pady=4)
+Button(master, text='Save scatter-plot', command=save_scatter).grid(row=15, column=3, pady=4)
+Button(master, text='Save histogram', command=save_histogram).grid(row=15, column=4, pady=4)
 mainloop()

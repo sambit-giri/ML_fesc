@@ -141,7 +141,7 @@ def get_object_details(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, xli
 		data_all = data_all[data_all[:,z_pos]>=zl]
 	if xlim_r: data_all = data_all[data_all[:,f_pos]<=xlim_r]
 	if xlim_l: data_all = data_all[data_all[:,f_pos]>=xlim_l]
-	return np.hstack((data_all[:,:5],np.expand_dims(data_all[:,z_pos],axis=1)))
+	return np.hstack((data_all[:,:5],data_all[:,z_pos:z_pos+3]))
 
 def show_object_details_ID(folder, obj_id):
 	filea = glob(folder+'/*_acs*')
@@ -160,7 +160,7 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 	mags_names = [s.split('/')[-1] for s in mags_fol]
 	ll = np.argwhere(lens_var==1)
 	mm = np.argwhere(mags_var==1)
-	to = 0
+	data_to = []
 	if ll.size:
 		for l in ll:
 			l = l[0]
@@ -176,9 +176,12 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			else: data = data_a*camera[0]+data_i*camera[1]
 			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print lens_names[l]
-			print 'ID\tRA\tDec\tx\ty\tzb'
+			print 'ID\tRA\tDec\tx\ty\tzb\tzbmin\tzbmax'
 			if data.size: 
-				for i in xrange(data.shape[0]): print data[i,:]
+				for i in xrange(data.shape[0]): 
+					print data[i,:]
+				data_to.append(lens_names[l])
+				data_to.append(data.tolist())
 	if mm.size:
 		for m in mm:
 			m = m[0]
@@ -194,8 +197,11 @@ def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1
 			else: data = data_a*camera[0]+data_i*camera[1]
 			data = get_object_details(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 			print mags_names[m]
-			print 'ID\tRA\tDec\tx\ty\tzb'
+			print 'ID\tRA\tDec\tx\ty\tzb\tzbmin\tzbmax'
 			if data.size: 
-				for i in xrange(data.shape[0]): print data[i,:]
-	return 0
+				for i in xrange(data.shape[0]): 
+					print data[i,:]
+				data_to.append(mags_names[m])
+				data_to.append(data.tolist())
+	return data_to
 
