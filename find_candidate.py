@@ -152,7 +152,9 @@ def show_object_details_ID(folder, obj_id):
 	loc = np.squeeze(np.argwhere(obj_id==data_all[:,0]))
 	if loc.shape == (): data = np.expand_dims(data_all[loc,:],axis=0)
 	else: data = np.array([data_all[l,:] for l in loc])
-	return data
+	z_pos = get_var_pos(filea[0], 'zb')
+	if data.size: return np.hstack((data[:,:5],data[:,z_pos:z_pos+3]))
+	else: return data
 
 def show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None, with_err=None):
 	assert camera[0] or camera[1] == 1
