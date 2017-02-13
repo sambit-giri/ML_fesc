@@ -1,7 +1,7 @@
 import numpy as np
 from glob import glob
 from Tkinter import *
-from find_candidate_FF import show_hist_z_range#, show_scatter_z, show_object_details
+from find_candidate_FF import show_hist_z_range, show_scatter_z, show_object_details
 import matplotlib.pyplot as plt
 
 master = Tk()
@@ -47,17 +47,15 @@ def display_scat(save=None):
 	if not save: plt.show()
 
 def display_details():
-	lens_var, mags_var = get_inputs()
-	camera = np.array([cam_a.get(),cam_i.get()])
+	lens_var = get_inputs()
 	zl, zh = float(e1.get()), float(e2.get())
-	stel   = float(e3.get())
 	f_name = e4.get()
 	if e5.get() == '': xlim_l = None 
 	else: xlim_l = float(e5.get())
 	if e6.get() == '': xlim_r = None
 	else: xlim_r = float(e6.get())
 	with_err = werr.get()
-	data = show_object_details(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
+	data = show_object_details(lens_fol, lens_var, zl, zh=zh, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 	return data
 
 def clear_figure():
@@ -70,7 +68,7 @@ def write_to_file():
 	fname = 'output/'+filename+'_info.txt'
 	print "Data saved as", fname
 	ff = open(fname, 'w')
-	header = 'ID\tRA\tDec\tx\ty\tzb\tzbmin\tzbmax\n'
+	header = 'ID\tRA\tDec\tx\ty\tzb\tzb_err'
 	for i in xrange(len(data)):
 		if i%2==0:
 			ff.writelines(data[i]+'\n')
@@ -85,14 +83,14 @@ def write_to_file():
 def save_scatter():
 	filename = e7.get()
 	fname = 'output/'+filename+'_scatter.png'
-	display_scat(save=True)
+	display_scat()
 	print "The figure is saved as", fname
 	plt.savefig(fname)
 
 def save_histogram():
 	filename = e7.get()
 	fname = 'output/'+filename+'_histogram.png'
-	display_hist(save=True)
+	display_hist()
 	print "The figure is saved as", fname
 	plt.savefig(fname)
 

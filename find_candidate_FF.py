@@ -50,43 +50,132 @@ def show_scatter_z(lens_fol, lens_var, zl, zh=1000, f_name='Y105', xlim_l=None, 
 		for l in ll:
 			l = l[0]
 			filez  = glob(lens_fol[l]+'/*_ZPHOT.cat')
-			filea  = glob(lens_fol[l]+'/*_B.cat')
+			filea  = glob(lens_fol[l]+'/*_A.cat')
 			z_pos  = get_var_pos(filez[0], 'zbest')
-			f_pos  = get_var_pos(filea[0], 'FLUX_'+f_name)
-			fr_pos = get_var_pos(filea[0], 'FLUXERR_'+f_name)
+			f_pos  = get_var_pos(filea[0], 'MAG_'+f_name)
+			fr_pos = get_var_pos(filea[0], 'MAGERR_'+f_name)
 			data_z = np.loadtxt(filez[0])[:,z_pos:z_pos+2]
 			data_m = np.loadtxt(filea[0])
 			data_m = np.vstack((data_m[:,f_pos],data_m[:,fr_pos])).T
-			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data_z, data_m, zl, zh=zh, z_pos=z_pos, f_pos=f_pos, fr_pos=fr_pos, with_err=with_err)
+			xx,yy,xerr,yerr = get_scatter_z(data_z, data_m, zl, zh=zh, fl=xlim_l, fh=xlim_r, with_err=with_err)
 			num0 = xx.shape[0]; num=num0
-			if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
-			if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
-			if xlim_l and xlim_r: num = num1+num2-num0
-			plt.errorbar(xx,yy, xerr=xerr, yerr=[yerr1,yerr2], label=lens_names[l]+'('+str(num)+')', fmt='o')
-			#to = xx.size
+			#if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
+			#if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
+			#if xlim_l and xlim_r: num = num1+num2-num0
+			plt.errorbar(xx,yy, xerr=xerr, yerr=yerr, label=lens_names[l]+'('+str(num)+')', fmt='o')
 	
-	plt.xlim(xlim_l,xlim_r)
+	#plt.xlim(xlim_l,xlim_r)
 	#plt.ylim(bottom=zl-1)
 	plt.xlabel('m')
 	plt.ylabel('z')
 	plt.legend(loc=0)
 	return to
 
-def get_scatter_z(data_z, data_a, zl, zh=zh, z_pos=z_pos, f_pos=f_pos, fr_pos=fr_pos, with_err=with_err):
+def get_scatter_z(data_z, data_a, zl, zh=100, fl=15, fh=30, with_err=None):
 	if with_err:
 		up = np.argwhere(data_z[:,0]+data_z[:,1]<=zh)
 		data_z = data_z[np.squeeze(up)]
+		data_a = data_a[np.squeeze(up)]
 		dn = np.argwhere(data_z[:,0]-data_z[:,1]>=zl)
 		data_z = data_z[np.squeeze(dn)]
+		data_a = data_a[np.squeeze(dn)]
+		if fh:
+			up = np.argwhere(data_a[:,0]+data_a[:,1]<=fh)
+			data_z = data_z[np.squeeze(up)]
+			data_a = data_a[np.squeeze(up)]
+		if fl:
+			dn = np.argwhere(data_a[:,0]-data_a[:,1]>=fl)
+			data_z = data_z[np.squeeze(dn)]
+			data_a = data_a[np.squeeze(dn)]
 	else:
 		up = np.argwhere(data_z[:,0]<=zh)
 		data_z = data_z[np.squeeze(up)]
+		data_a = data_a[np.squeeze(up)]
 		dn = np.argwhere(data_z[:,0]>=zl)
 		data_z = data_z[np.squeeze(dn)]
-	data_z = data_all[:,z_pos]
-	data_f = data_all[:,f_pos]
-	data_f_er = data_all[:,f_pos+1]
-	data_z_lo = data_z-data_all[:,z_pos+1]
-	data_z_hi = data_all[:,z_pos+2]-data_z
-	return data_f, data_z, data_f_er, data_z_lo, data_z_hi
+		data_a = data_a[np.squeeze(dn)]
+		if fh:
+			up = np.argwhere(data_a[:,0]<=fh)
+			data_z = data_z[np.squeeze(up)]
+			data_a = data_a[np.squeeze(up)]
+		if fl:
+			dn = np.argwhere(data_a[:,0]>=fl)
+			data_z = data_z[np.squeeze(dn)]
+			data_a = data_a[np.squeeze(dn)]
+	data_z_ = data_z[:,0]
+	data_f = data_a[:,0]
+	data_f_er = data_z[:,1]
+	data_z_er = data_z[:,1]
+	return data_f, data_z_, data_f_er, data_z_er
+
+
+def show_object_details(lens_fol, lens_var, zl, zh=1000, f_name='Y105', xlim_l=None, xlim_r=None, with_err=None):
+	lens_names = [s.split('/')[-1] for s in lens_fol]
+	ll = np.argwhere(lens_var==1)
+	data_to = []
+	if ll.size:
+		for l in ll:
+			l = l[0]
+			filez = glob(lens_fol[l]+'/*_ZPHOT.cat')
+			filea = glob(lens_fol[l]+'/*_A.cat*')
+			z_pos  = get_var_pos(filez[0], 'zbest')
+			f_pos  = get_var_pos(filea[0], 'MAG_'+f_name)
+			fr_pos = get_var_pos(filea[0], 'MAGERR_'+f_name)
+			data_z = np.loadtxt(filez[0])[:,z_pos:z_pos+2]
+			data_m = np.loadtxt(filea[0])
+			data_m = np.hstack((np.vstack((data_m[:,f_pos],data_m[:,fr_pos])).T,data_m[:,:5]))
+			data = get_object_details(data_z, data_m, zl, zh=zh, fl=xlim_l, fh=xlim_r, with_err=with_err)
+			print lens_names[l]
+			print 'ID\tRA\tDec\tx\ty\tzb\tzb_err'
+			if data.size: 
+				for i in xrange(data.shape[0]): 
+					print data[i,:]
+				data_to.append(lens_names[l])
+				data_to.append(data.tolist())
+	return data_to
+
+
+
+def get_object_details(data_z, data_a, zl, zh=100, fl=15, fh=30, with_err=None):
+	if with_err:
+		up = np.argwhere(data_z[:,0]+data_z[:,1]<=zh)
+		data_z = data_z[np.squeeze(up)]
+		data_a = data_a[np.squeeze(up)]
+		dn = np.argwhere(data_z[:,0]-data_z[:,1]>=zl)
+		data_z = data_z[np.squeeze(dn)]
+		data_a = data_a[np.squeeze(dn)]
+		if fh:
+			up = np.argwhere(data_a[:,0]+data_a[:,1]<=fh)
+			data_z = data_z[np.squeeze(up)]
+			data_a = data_a[np.squeeze(up)]
+		if fl:
+			dn = np.argwhere(data_a[:,0]-data_a[:,1]>=fl)
+			data_z = data_z[np.squeeze(dn)]
+			data_a = data_a[np.squeeze(dn)]
+	else:
+		up = np.argwhere(data_z[:,0]<=zh)
+		data_z = data_z[np.squeeze(up)]
+		data_a = data_a[np.squeeze(up)]
+		dn = np.argwhere(data_z[:,0]>=zl)
+		data_z = data_z[np.squeeze(dn)]
+		data_a = data_a[np.squeeze(dn)]
+		if fh:
+			up = np.argwhere(data_a[:,0]<=fh)
+			data_z = data_z[np.squeeze(up)]
+			data_a = data_a[np.squeeze(up)]
+		if fl:
+			dn = np.argwhere(data_a[:,0]>=fl)
+			data_z = data_z[np.squeeze(dn)]
+			data_a = data_a[np.squeeze(dn)]
+	return np.hstack((data_a[:,2:],data_z))
+
+
+
+
+
+
+
+
+
+
 
