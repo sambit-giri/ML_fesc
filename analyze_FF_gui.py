@@ -36,26 +36,26 @@ def display_hist(save=None):
 def display_scat(save=None):
 	lens_var = get_inputs()
 	zl, zh = float(e1.get()), float(e2.get())
-	f_name = e4.get()
+	lam_rest = float(e4.get())
 	if e5.get() == '': xlim_l = None 
 	else: xlim_l = float(e5.get())
 	if e6.get() == '': xlim_r = None
 	else: xlim_r = float(e6.get())
 	with_err = werr.get()
 	plt.clf()
-	show_scatter_z(lens_fol, lens_var, zl, zh=zh, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
+	show_scatter_z(lens_fol, lens_var, zl, zh=zh, lam_rest=lam_rest, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 	if not save: plt.show()
 
 def display_details():
 	lens_var = get_inputs()
 	zl, zh = float(e1.get()), float(e2.get())
-	f_name = e4.get()
+	lam_rest = float(e4.get())
 	if e5.get() == '': xlim_l = None 
 	else: xlim_l = float(e5.get())
 	if e6.get() == '': xlim_r = None
 	else: xlim_r = float(e6.get())
 	with_err = werr.get()
-	data = show_object_details(lens_fol, lens_var, zl, zh=zh, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
+	data = show_object_details(lens_fol, lens_var, zl, zh=zh, lam_rest=lam_rest, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 	return data
 
 def clear_figure():
@@ -124,10 +124,10 @@ bn = Entry(master)
 bn.grid(row=11, column=1)
 bn.insert(END, '10')
 
-Label(master, text="Filter name:", fg="red").grid(row=12, column=0, sticky=W)
+Label(master, text="Rest wavelength (ang):", fg="red").grid(row=12, column=0, sticky=W)
 e4 = Entry(master)
 e4.grid(row=12, column=1)
-e4.insert(END, 'Y105')
+e4.insert(END, '1500')
 
 Label(master, text="Magnitude range:").grid(row=13, column=0)
 e5 = Entry(master)

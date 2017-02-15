@@ -7,6 +7,11 @@ def filter_zeroth_flux(name):
 	fluxes  = [4040., 3233., 2414.5, 1975.16, 1564.25, 1324.81, 1138.06, 277.22, 179.04]
 	return fluxes[filters.index(name.upper)]
 
+def get_filter_name(lam_rest, z):
+	filters    = np.array(['B435','V606','I814','Y105','J125','JH140','H160','IRAC1', 'IRAC2'])
+	filter_lam = np.array([4350., 6060., 8140., 10500., 12500., 14000., 16000., 36000., 45000.])
+	obs_lam    = lam_rest*(1+z)
+	return filters[np.abs(filter_lam-obs_lam).argmin()]
 
 def histogram_z_range(data_all, zl, zh=1000, bins=10, z_pos=115):
 	data_z = data_all[:,z_pos]
@@ -42,7 +47,7 @@ def get_var_pos(filename, name):
 	var_pos = lin.index(name.upper())-1
 	return var_pos
 
-def show_scatter_z(lens_fol, lens_var, zl, zh=1000, f_name='Y105', xlim_l=None, xlim_r=None, with_err=None):
+def show_scatter_z(lens_fol, lens_var, zl, zh=1000, lam_rest=1500., xlim_l=None, xlim_r=None, with_err=None):
 	lens_names = [s.split('/')[-1] for s in lens_fol]
 	ll = np.argwhere(lens_var==1)
 	to = 0
@@ -52,11 +57,12 @@ def show_scatter_z(lens_fol, lens_var, zl, zh=1000, f_name='Y105', xlim_l=None, 
 			filez  = glob(lens_fol[l]+'/*_ZPHOT.cat')
 			filea  = glob(lens_fol[l]+'/*_A.cat')
 			z_pos  = get_var_pos(filez[0], 'zbest')
-			f_pos  = get_var_pos(filea[0], 'MAG_'+f_name)
-			fr_pos = get_var_pos(filea[0], 'MAGERR_'+f_name)
+			#f_pos  = get_var_pos(filea[0], 'MAG_'+f_name)
+			#fr_pos = get_var_pos(filea[0], 'MAGERR_'+f_name)
 			data_z = np.loadtxt(filez[0])[:,z_pos:z_pos+2]
-			data_m = np.loadtxt(filea[0])
-			data_m = np.vstack((data_m[:,f_pos],data_m[:,fr_pos])).T
+			#data_m = np.loadtxt(filea[0])
+			#data_m = np.vstack((data_m[:,f_pos],data_m[:,fr_pos])).T
+			data_m = get_obs_mags(filea[0], data_z[:,0], lam_rest)
 			xx,yy,xerr,yerr = get_scatter_z(data_z, data_m, zl, zh=zh, fl=xlim_l, fh=xlim_r, with_err=with_err)
 			num0 = xx.shape[0]; num=num0
 			#if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
@@ -70,6 +76,17 @@ def show_scatter_z(lens_fol, lens_var, zl, zh=1000, f_name='Y105', xlim_l=None, 
 	plt.ylabel('z')
 	plt.legend(loc=0)
 	return to
+
+def get_obs_mags(file_name, zs, lam_rest):
+	f_names  = [get_filter_name(lam_rest, z) for z in zs]
+	f_poses  = [get_var_pos(file_name, 'MAG_'+f_name) for f_name in f_names]
+	fr_poses = [get_var_pos(file_name, 'MAGERR_'+f_name) for f_name in f_names]
+	data_m = np.zeros((len(zs),2))
+	data   = np.loadtxt(file_name)
+	for i in xrange(len(zs)):
+		data_m[i,0] = data[i,f_poses[i]]
+		data_m[i,1] = data[i,fr_poses[i]]
+	return data_m
 
 def get_scatter_z(data_z, data_a, zl, zh=100, fl=15, fh=30, with_err=None):
 	if with_err:
@@ -109,7 +126,7 @@ def get_scatter_z(data_z, data_a, zl, zh=100, fl=15, fh=30, with_err=None):
 	return data_f, data_z_, data_f_er, data_z_er
 
 
-def show_object_details(lens_fol, lens_var, zl, zh=1000, f_name='Y105', xlim_l=None, xlim_r=None, with_err=None):
+def show_object_details(lens_fol, lens_var, zl, zh=1000, lam_rest=1500., xlim_l=None, xlim_r=None, with_err=None):
 	lens_names = [s.split('/')[-1] for s in lens_fol]
 	ll = np.argwhere(lens_var==1)
 	data_to = []
@@ -134,8 +151,7 @@ def show_object_details(lens_fol, lens_var, zl, zh=1000, f_name='Y105', xlim_l=N
 				data_to.append(data.tolist())
 	return data_to
 
-
-
+	
 def get_object_details(data_z, data_a, zl, zh=100, fl=15, fh=30, with_err=None):
 	if with_err:
 		up = np.argwhere(data_z[:,0]+data_z[:,1]<=zh)
