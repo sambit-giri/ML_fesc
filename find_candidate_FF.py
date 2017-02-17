@@ -111,7 +111,7 @@ def get_scatter_z(data_z, data_a, zl, zh=100, fl=15, fh=30, with_err=None):
 			data_a = data_a[np.squeeze(dn)]
 	data_z_ = data_z[:,0]
 	data_f = data_a[:,0]
-	data_f_er = data_z[:,1]
+	data_f_er = data_a[:,1]
 	data_z_er = data_z[:,1]
 	return data_f, data_z_, data_f_er, data_z_er
 
@@ -176,10 +176,55 @@ def get_object_details(data_z, data_a, zl, zh=100, fl=15, fh=30, with_err=None):
 	return np.hstack((data_a[:,2:],data_z))
 
 
+#### For Mock catalogue
 
+def intrinsic_mag(obs_mags, magnif):
+	return obs_mags + 2.5*np.log(magnif)
 
-
-
+def remove_limits(data_z, data_a, data_o, zl, zh=100, fl=15, fh=30, with_err=None):
+	if with_err:
+		up = np.argwhere(data_z[:,0]+data_z[:,1]<=zh)
+		data_z = data_z[np.squeeze(up)]
+		data_a = data_a[np.squeeze(up)]
+		data_o = data_o[np.squeeze(up)]
+		dn = np.argwhere(data_z[:,0]-data_z[:,1]>=zl)
+		data_z = data_z[np.squeeze(dn)]
+		data_a = data_a[np.squeeze(dn)]
+		data_o = data_o[np.squeeze(dn)]
+		if fh:
+			up = np.argwhere(data_a[:,0]+data_a[:,1]<=fh)
+			data_z = data_z[np.squeeze(up)]
+			data_a = data_a[np.squeeze(up)]
+			data_o = data_o[np.squeeze(up)]
+		if fl:
+			dn = np.argwhere(data_a[:,0]-data_a[:,1]>=fl)
+			data_z = data_z[np.squeeze(dn)]
+			data_a = data_a[np.squeeze(dn)]
+			data_o = data_o[np.squeeze(dn)]
+	else:
+		up = np.argwhere(data_z[:,0]<=zh)
+		data_z = data_z[np.squeeze(up)]
+		data_a = data_a[np.squeeze(up)]
+		data_o = data_o[np.squeeze(up)]
+		dn = np.argwhere(data_z[:,0]>=zl)
+		data_z = data_z[np.squeeze(dn)]
+		data_a = data_a[np.squeeze(dn)]
+		data_o = data_o[np.squeeze(dn)]
+		if fh:
+			up = np.argwhere(data_a[:,0]<=fh)
+			data_z = data_z[np.squeeze(up)]
+			data_a = data_a[np.squeeze(up)]
+			data_o = data_o[np.squeeze(up)]
+		if fl:
+			dn = np.argwhere(data_a[:,0]>=fl)
+			data_z = data_z[np.squeeze(dn)]
+			data_a = data_a[np.squeeze(dn)]
+			data_o = data_o[np.squeeze(dn)]
+	data_z_ = data_z[:,0]
+	data_f = data_a[:,0]
+	data_f_er = data_a[:,1]
+	data_z_er = data_z[:,1]
+	return data_z, data_a, data_o
 
 
 

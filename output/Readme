@@ -1,0 +1,11 @@
+#ID		 Object ID
+#x		 x pixel corrdinate
+#y		 y pixel coordinate
+#RA		 Right Ascension
+#DEC		 Declination
+#z_best		 Best fit photometric redshift
+#z_err		 Redshift error
+#magnif		 median magnification (cluster field) or magnification from Merten model (parallel field)
+#MAG1500_obs	 AB magnitude observed for rest wavelength of 1500 Å
+#MAG1500_err	 Error in the observed AB magnitude
+#MAG1500_int	 Calculated delensed AB magnitude
