@@ -2,6 +2,11 @@ import numpy as np
 from glob import glob
 import matplotlib.pyplot as plt
 
+def get_filter_name(lam_rest, z):
+	filters    = np.array(['f225w','f275w','f336w','f390w', 'f435w','f475w','f606w','f625w','f775w', 'f814w','f850lp', 'f105w', 'f110w', 'f125w', 'f140w', 'f160w'])
+	filter_lam = np.array([2250., 2750., 3360., 3900., 4350., 4750., 6060., 6250., 7750., 8140., 8500., 10500., 11000., 12500., 14000., 16000.])
+	obs_lam    = lam_rest*(1+z)
+	return filters[np.abs(filter_lam-obs_lam).argmin()]
 
 def histogram_z_range(data_all, zl, zh=1000, bins=10, stel=0.2, z_pos=115):
 	data_all = data_all[data_all[:,7]<stel]
@@ -62,7 +67,7 @@ def get_var_pos(filename, name):
 	var_pos = int(lin[lin.index(name)-1])
 	return var_pos-1
 
-def get_scatter_z(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, with_err=None):
+def get_scatter_z(data_all, data_z, zl, zh=1000, stel=0.2, z_pos=115, with_err=None, filename='', lam_rest=1500.):
 	data_all = data_all[data_all[:,7]<stel]
 	if with_err:
 		data_all = data_all[data_all[:,z_pos+2]<=zh]
@@ -71,13 +76,25 @@ def get_scatter_z(data_all, zl, zh=1000, stel=0.2, z_pos=115, f_pos=97, with_err
 		data_all = data_all[data_all[:,z_pos]<=zh]
 		data_all = data_all[data_all[:,z_pos]>=zl]
 	data_z = data_all[:,z_pos]
-	data_f = data_all[:,f_pos]
-	data_f_er = data_all[:,f_pos+1]
+	data_m = get_obs_mags(data_all, filename, data_z, lam_rest)
+	data_f,data_f_er = data_m[:,0], data_m[:,1]
 	data_z_lo = data_z-data_all[:,z_pos+1]
 	data_z_hi = data_all[:,z_pos+2]-data_z
 	return data_f, data_z, data_f_er, data_z_lo, data_z_hi
 
-def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, f_name='f105w', xlim_l=None, xlim_r=None, with_err=None):
+
+def get_obs_mags(data, file_name, zs, lam_rest):
+	f_names  = [get_filter_name(lam_rest, z) for z in zs]
+	f_poses  = [get_var_pos(file_name, f_name+'_mag') for f_name in f_names]
+	fr_poses = [get_var_pos(file_name, f_name+'_magerr') for f_name in f_names]
+	data_m = np.zeros((len(zs),2))
+	data   = np.loadtxt(file_name)
+	for i in xrange(len(zs)):
+		data_m[i,0] = data[i,f_poses[i]]
+		data_m[i,1] = data[i,fr_poses[i]]
+	return data_m
+
+def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, stel=0.2, lam_rest=1500., xlim_l=None, xlim_r=None, with_err=None):
 	assert camera[0] or camera[1] == 1
 	lens_names = [s.split('/')[-1] for s in lens_fol]
 	mags_names = [s.split('/')[-1] for s in mags_fol]
@@ -90,14 +107,15 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 			filea = glob(lens_fol[l]+'/*_acs*')
 			filei = glob(lens_fol[l]+'/*_ir*')
 			z_pos = get_var_pos(filea[0], 'zb')
-			f_pos = get_var_pos(filea[0], f_name+'_mag')
+			#f_pos = get_var_pos(filea[0], f_name+'_mag')
 			data_a, data_i = 0, 0
 			if camera[0]: data_a = np.loadtxt(filea[0])
 			if camera[1]: data_i = np.loadtxt(filei[0])
 			if camera[0] and camera[1]:
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
-			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, with_err=with_err)
+			data_z = data[:,z_pos]
+			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, data_z, zl, zh=zh, stel=stel, z_pos=z_pos, with_err=with_err, filename=filea[0], lam_rest=lam_rest)
 			num0 = xx.shape[0]; num=num0
 			if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
 			if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
@@ -110,14 +128,15 @@ def show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=1000, 
 			filea = glob(mags_fol[m]+'/*_acs*')
 			filei = glob(mags_fol[m]+'/*_ir*')
 			z_pos = get_var_pos(filea[0], 'zb')
-			f_pos = get_var_pos(filea[0], f_name+'_mag')
+			#f_pos = get_var_pos(filea[0], f_name+'_mag')
 			data_a, data_i = 0, 0
 			if camera[0]: data_a = np.loadtxt(filea[0])
 			if camera[1]: data_i = np.loadtxt(filei[0])
 			if camera[0] and camera[1]:
 				data = np.vstack((data_a,data_i))
 			else: data = data_a*camera[0]+data_i*camera[1]
-			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, zl, zh=zh, stel=stel, z_pos=z_pos, f_pos=f_pos, with_err=with_err)
+			data_z = data[:,z_pos]
+			xx,yy,xerr,yerr1,yerr2 = get_scatter_z(data, data_z, zl, zh=zh, stel=stel, z_pos=z_pos, with_err=with_err, filename=filea[0])
 			num0 = xx.shape[0]; num=num0
 			if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
 			if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2

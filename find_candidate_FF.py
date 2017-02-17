@@ -57,21 +57,11 @@ def show_scatter_z(lens_fol, lens_var, zl, zh=1000, lam_rest=1500., xlim_l=None,
 			filez  = glob(lens_fol[l]+'/*_ZPHOT.cat')
 			filea  = glob(lens_fol[l]+'/*_A.cat')
 			z_pos  = get_var_pos(filez[0], 'zbest')
-			#f_pos  = get_var_pos(filea[0], 'MAG_'+f_name)
-			#fr_pos = get_var_pos(filea[0], 'MAGERR_'+f_name)
 			data_z = np.loadtxt(filez[0])[:,z_pos:z_pos+2]
-			#data_m = np.loadtxt(filea[0])
-			#data_m = np.vstack((data_m[:,f_pos],data_m[:,fr_pos])).T
 			data_m = get_obs_mags(filea[0], data_z[:,0], lam_rest)
 			xx,yy,xerr,yerr = get_scatter_z(data_z, data_m, zl, zh=zh, fl=xlim_l, fh=xlim_r, with_err=with_err)
 			num0 = xx.shape[0]; num=num0
-			#if xlim_l: num1 = xx[xx>=xlim_l].shape[0];num=num1
-			#if xlim_r: num2 = xx[xx<=xlim_r].shape[0];num=num2
-			#if xlim_l and xlim_r: num = num1+num2-num0
 			plt.errorbar(xx,yy, xerr=xerr, yerr=yerr, label=lens_names[l]+'('+str(num)+')', fmt='o')
-	
-	#plt.xlim(xlim_l,xlim_r)
-	#plt.ylim(bottom=zl-1)
 	plt.xlabel('m')
 	plt.ylabel('z')
 	plt.legend(loc=0)

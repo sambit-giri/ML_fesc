@@ -43,14 +43,14 @@ def display_scat(save=None):
 	camera = np.array([cam_a.get(),cam_i.get()])
 	zl, zh = float(e1.get()), float(e2.get())
 	stel   = float(e3.get())
-	f_name = e4.get()
+	lam_rest = float(e4.get())
 	if e5.get() == '': xlim_l = None 
 	else: xlim_l = float(e5.get())
 	if e6.get() == '': xlim_r = None
 	else: xlim_r = float(e6.get())
 	with_err = werr.get()
 	plt.clf()
-	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, f_name=f_name, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
+	show_scatter_z(lens_fol, mags_fol, lens_var, mags_var, camera, zl, zh=zh, stel=stel, lam_rest=lam_rest, xlim_l=xlim_l, xlim_r=xlim_r, with_err=with_err)
 	if not save: plt.show()
 
 def display_details():
@@ -182,10 +182,10 @@ e3 = Entry(master)
 e3.grid(row=9, column=1)
 e3.insert(END, '0.2')
 
-Label(master, text="Filter name:", fg="red").grid(row=12, column=0, sticky=W)
+Label(master, text="Rest wavelength (nm):", fg="red").grid(row=12, column=0, sticky=W)
 e4 = Entry(master)
 e4.grid(row=12, column=1)
-e4.insert(END, 'f105w')
+e4.insert(END, '1500')
 
 Label(master, text="Magnitude range:").grid(row=13, column=0)
 e5 = Entry(master)
